@@ -26,21 +26,24 @@ def p_001() -> None:
     """
     レシート明細データ（df_receipt）から全項目の先頭10件を表示し、どのようなデータを保有しているか目視で確認せよ。
     """
-    print(dataset.df_receipt.head(10))
+    res = dataset.df_receipt.head(10)
+    print(res)
 
 
 def p_002() -> None:
     """
     レシート明細データ（df_receipt）から売上年月日（sales_ymd）、顧客ID（customer_id）、商品コード（product_cd）、売上金額（amount）の順に列を指定し、10件表示せよ。
     """
-    print(dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "amount"]).head(10))
+    res = dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "amount"]).head(10)
+    print(res)
 
 
 def p_003() -> None:
     """
     レシート明細データ（df_receipt）から売上年月日（sales_ymd）、顧客ID（customer_id）、商品コード（product_cd）、売上金額（amount）の順に列を指定し、10件表示せよ。ただし、sales_ymdsales_dateに項目名を変更しながら抽出すること。
     """
-    print(dataset.df_receipt.select([pl.col("sales_ymd").alias("sales_date"), "customer_id", "product_cd", "amount"]).head(10))
+    res = dataset.df_receipt.select([pl.col("sales_ymd").alias("sales_date"), "customer_id", "product_cd", "amount"]).head(10)
+    print(res)
 
 
 def p_004() -> None:
@@ -49,11 +52,10 @@ def p_004() -> None:
 
     - 顧客ID（customer_id）が"CS018205000001"
     """
-    print(
-        dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "amount"]).filter(
-            pl.col("customer_id") == "CS018205000001"
-        )
+    res = dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "amount"]).filter(
+        pl.col("customer_id") == "CS018205000001"
     )
+    print(res)
 
 
 def p_005() -> None:
@@ -63,11 +65,10 @@ def p_005() -> None:
     - 顧客ID（customer_id）が"CS018205000001"
     - 売上金額（amount）が1,000以上
     """
-    print(
-        dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "amount"]).filter(
-            (pl.col("customer_id") == "CS018205000001") & (pl.col("amount") >= 1000)
-        )
+    res = dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "amount"]).filter(
+        (pl.col("customer_id") == "CS018205000001") & (pl.col("amount") >= 1000)
     )
+    print(res)
 
 
 def p_006() -> None:
@@ -77,11 +78,10 @@ def p_006() -> None:
     - 顧客ID（customer_id）が"CS018205000001"
     - 売上金額（amount）が1,000以上または売上数量（quantity）が5以上
     """
-    print(
-        dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "quantity", "amount"]).filter(
-            (pl.col("customer_id") == "CS018205000001") & ((pl.col("amount") >= 1000) | (pl.col("quantity") >= 5))
-        )
+    res = dataset.df_receipt.select(["sales_ymd", "customer_id", "product_cd", "quantity", "amount"]).filter(
+        (pl.col("customer_id") == "CS018205000001") & ((pl.col("amount") >= 1000) | (pl.col("quantity") >= 5))
     )
+    print(res)
 
 
 def p_007() -> None:
@@ -136,9 +136,6 @@ def p_012() -> None:
     """店舗データ（df_store）から、住所 (address) に"横浜市"が含まれるものだけ全項目表示せよ。"""
     res = dataset.df_store.filter(pl.col("address").str.contains("横浜市"))
     print(res)
-
-
-# 正規表現
 
 
 def p_013() -> None:
