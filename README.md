@@ -22,5 +22,6 @@ poetry run pytest
 
 # Links
 - https://github.com/The-Japan-DataScientist-Society/100knocks-preprocess
+- [問題](https://github.com/The-Japan-DataScientist-Society/100knocks-preprocess/blob/3a42834163382c38362f4554be47ac3324fbe400/docker/work/answer/ans_preprocess_knock_Python.ipynb)
 - https://qiita.com/_jinta/items/28442d25bba067c13bb7
 - https://qiita.com/_jinta/items/394b1682893e5991d592
