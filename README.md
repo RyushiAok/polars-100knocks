@@ -7,3 +7,14 @@
 pyenv local 3.11.x
 poetry install
 poetry run pre-commit install
+
+## Run
+```sh
+poetry run task main
+```
+## Test
+```sh
+poetry run task test
+# or
+poetry run pytest
+```
