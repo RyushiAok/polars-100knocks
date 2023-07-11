@@ -523,7 +523,7 @@ def p_043(dataset: Dataset) -> None:
         )
         .with_columns(
             age_range=((pl.col("age") / 10).floor() * 10),
-            gender=pl.col("gender_cd").apply(lambda x: gender_map[x]),
+            gender=pl.col("gender_cd").map_dict(gender_map),
         )
         .groupby(["gender", "age_range"])
         .agg(pl.col("amount").sum())
@@ -544,7 +544,7 @@ def p_044(dataset: Dataset) -> None:
         )
         .with_columns(
             age_range=((pl.col("age") / 10).floor() * 10),
-            gender=pl.col("gender_cd").apply(lambda x: gender_map[x]),
+            gender=pl.col("gender_cd").map_dict(gender_map),
         )
         .groupby(["gender", "age_range"])
         .agg(pl.col("amount").sum())
