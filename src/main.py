@@ -526,3 +526,162 @@ def p_040() -> None:
         .shape
     )
     print(res)
+
+
+def p_041() -> None:
+    """レシート明細データ（df_receipt）の売上金額（amount）を日付（sales_ymd）ごとに集計し、
+    前回売上があった日からの売上金額増減を計算せよ。そして結果を10件表示せよ。"""
+    res = (
+        dataset.df_receipt.groupby("sales_ymd")
+        .agg(pl.col("amount").sum())
+        .sort("sales_ymd")
+        .with_columns(
+            (pl.col("amount") - pl.col("amount").shift()).alias("diff_amount")
+        )
+        .head(10)
+    )
+    print(res)
+
+
+def p_043() -> None:
+    """
+    レシート明細データ（df_receipt）と顧客データ（df_customer）を結合し、
+    性別コード（gender_cd）と年代（ageから計算）ごとに売上金額（amount）を合計した売上サマリデータを作成せよ。
+    性別コードは0が男性、1が女性、9が不明を表すものとする。
+    ただし、項目構成は年代、女性の売上金額、男性の売上金額、
+    性別不明の売上金額の4項目とすること（縦に年代、横に性別のクロス集計）。また、年代は10歳ごとの階級とすること。
+    """
+    gender_map: dict[str, str] = {"0": "male", "1": "female", "9": "unknown"}
+    res = (
+        dataset.df_customer.join(
+            dataset.df_receipt, on="customer_id", how="left"
+        )
+        .with_columns(
+            [
+                ((pl.col("age") / 10).floor() * 10).alias("age_range"),
+                pl.col("gender_cd")
+                .apply(lambda x: gender_map[x])
+                .alias("gender"),
+            ]
+        )
+        .groupby(["gender", "age_range"])
+        .agg(pl.col("amount").sum())
+        .pivot(values="amount", index="age_range", columns="gender")
+        .sort("age_range")
+    )
+    print(res)
+
+
+def p_044() -> None:
+    """043で作成した売上サマリデータ（df_sales_summary）は性別の売上を横持ちさせたものであった。
+    このデータから性別を縦持ちさせ、年代、性別コード、売上金額の3項目に変換せよ。
+    ただし、性別コードは男性を"00"、女性を"01"、不明を"99"とする。"""
+    gender_map: dict[str, str] = {"0": "male", "1": "female", "9": "unknown"}
+    res = (
+        dataset.df_customer.join(
+            dataset.df_receipt, how="left", on="customer_id"
+        )
+        .with_columns(
+            [
+                ((pl.col("age") / 10).floor() * 10).alias("age_range"),
+                pl.col("gender_cd")
+                .apply(lambda x: gender_map[x])
+                .alias("gender"),
+            ]
+        )
+        .groupby(["gender", "age_range"])
+        .agg(pl.col("amount").sum())
+        .sort(["age_range", "gender"])
+    )
+    print(res)
+
+
+def p_045() -> None:
+    """顧客データ（df_customer）の生年月日（birth_day）は日付型でデータを保有している。
+    これをYYYYMMDD形式の文字列に変換し、顧客ID（customer_id）とともに10件表示せよ。"""
+    res = dataset.df_customer.select(
+        ["customer_id", pl.col("birth_day").dt.strftime("%Y%m%d")]
+    ).head(10)
+    print(res)
+
+
+def p_046() -> None:
+    """顧客データ（df_customer）の申し込み日（application_date）は
+    YYYYMMDD形式の文字列型でデータを保有している。これを日付型に変換し、顧客ID（customer_id）とともに10件表示せよ。"""
+    res = dataset.df_customer.select(
+        [
+            "customer_id",
+            pl.col("application_date").str.strptime(pl.Date, "%Y%m%d"),
+        ]
+    ).head(10)
+    print(res)
+
+
+def p_047() -> None:
+    """
+    レシート明細データ（df_receipt）の売上日（sales_ymd）はYYYYMMDD形式の数値型でデータを保有している。
+    これを日付型に変換し、レシート番号（receipt_no）、レシートサブ番号（receipt_sub_no）とともに10件表示せよ。
+    """
+    res = dataset.df_receipt.select(
+        [
+            "receipt_no",
+            "receipt_sub_no",
+            pl.col("sales_ymd").cast(pl.Utf8).str.strptime(pl.Date, "%Y%m%d"),
+        ]
+    ).head(10)
+    print(res)
+
+
+def p_048() -> None:
+    """
+    レシート明細データ（df_receipt）の売上エポック秒（sales_epoch）は数値型のUNIX秒でデータを保有している。
+    これを日付型に変換し、レシート番号(receipt_no)、レシートサブ番号（receipt_sub_no）とともに10件表示せよ。
+    """
+    res = dataset.df_receipt.select(
+        [
+            "receipt_no",
+            "receipt_sub_no",
+            pl.col("sales_epoch").cast(pl.Datetime),
+        ]
+    ).head(10)
+    print(res)
+
+
+def p_049() -> None:
+    """
+    レシート明細データ（df_receipt）の売上エポック秒（sales_epoch）を日付型に変換し、
+    「年」だけ取り出してレシート番号(receipt_no)、レシートサブ番号（receipt_sub_no）とともに10件表示せよ。
+    """
+    res = dataset.df_receipt.select(
+        [
+            "receipt_no",
+            "receipt_sub_no",
+            pl.col("sales_epoch")
+            .cast(pl.Utf8)
+            .str.strptime(pl.Datetime, "%s")
+            .dt.year()
+            .alias("sales_year"),
+        ]
+    ).head(10)
+    print(res)
+
+
+def p_050() -> None:
+    """
+    レシート明細データ（df_receipt）の売上エポック秒（sales_epoch）を日付型に変換し、「月」だけ取り出してレシート番号(receipt_no)、
+    レシートサブ番号（receipt_sub_no）とともに10件表示せよ。なお、「月」は0埋め2桁で取り出すこと。
+    """
+    res = dataset.df_receipt.select(
+        [
+            "receipt_no",
+            "receipt_sub_no",
+            pl.col("sales_epoch")
+            .cast(pl.Datetime)
+            .dt.strftime("%m")
+            .alias("sales_month"),
+        ]
+    )
+    print(res)
+
+
+p_050()
