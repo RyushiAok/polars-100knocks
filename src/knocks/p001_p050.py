@@ -496,9 +496,9 @@ def p_040(dataset: Dataset) -> None:
     店舗データ（df_store）と商品データ（df_product）を直積し、件数を計算せよ。
     """
     res = (
-        dataset.df_store.with_columns(pl.lit(0).alias("key"))
+        dataset.df_store.with_columns(key=0)  # pl.lit(0).alias("key")
         .join(
-            dataset.df_product.with_columns(pl.lit(0).alias("key")),
+            dataset.df_product.with_columns(key=0),
             on="key",
             how="inner",
         )
