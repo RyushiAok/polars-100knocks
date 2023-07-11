@@ -26,12 +26,10 @@ def p_003(dataset: Dataset) -> None:
     レシート明細データ（df_receipt）から売上年月日（sales_ymd）、顧客ID（customer_id）、商品コード（product_cd）、売上金額（amount）の順に列を指定し、10件表示せよ。ただし、sales_ymdsales_dateに項目名を変更しながら抽出すること。
     """
     res = dataset.df_receipt.select(
-        [
-            pl.col("sales_ymd").alias("sales_date"),
-            "customer_id",
-            "product_cd",
-            "amount",
-        ]
+        sales_date=pl.col("sales_ymd"),
+        customer_id="customer_id",
+        product_cd="product_cd",
+        amount="amount",
     ).head(10)
     print(res)
 
@@ -201,13 +199,9 @@ def p_019(dataset: Dataset) -> None:
     """
     res = (
         dataset.df_receipt.select(
-            [
-                "customer_id",
-                "amount",
-                pl.col("amount")
-                .rank(method="max", descending=True)
-                .alias("ranking"),
-            ]
+            customer_id="customer_id",
+            amount="amount",
+            ranking=pl.col("amount").rank(method="max", descending=True),
         )
         .sort("ranking")
         .head(10)
@@ -223,13 +217,9 @@ def p_020(dataset: Dataset) -> None:
     """
     data = (
         dataset.df_receipt.select(
-            [
-                pl.col("customer_id"),
-                pl.col("amount"),
-                pl.col("amount")
-                .rank(method="random", descending=True)
-                .alias("ranking"),
-            ]
+            customer_id=pl.col("customer_id"),
+            amount=pl.col("amount"),
+            ranking=pl.col("amount").rank(method="random", descending=True),
         )
         .sort("ranking")
         .head(10)
@@ -288,10 +278,8 @@ def p_026(dataset: Dataset) -> None:
     res = (
         dataset.df_receipt.groupby("customer_id")
         .agg(
-            [
-                pl.col("sales_ymd").min().alias("sales_ymd_min"),
-                pl.col("sales_ymd").max().alias("sales_ymd_max"),
-            ]
+            sales_ymd_min=pl.col("sales_ymd").min(),
+            sales_ymd_max=pl.col("sales_ymd").max(),
         )
         .filter(pl.col("sales_ymd_min") != pl.col("sales_ymd_max"))
         .sort("customer_id")
@@ -305,7 +293,7 @@ def p_027(dataset: Dataset) -> None:
     店舗コード（store_cd）ごとに売上金額（amount）の平均を計算し、降順でTOP5を表示せよ。"""
     res = (
         dataset.df_receipt.groupby("store_cd")
-        .agg(pl.col("amount").mean().alias("amount_mean"))
+        .agg(amount_mean=pl.col("amount").mean())
         .sort("amount_mean", descending=True)
         .head(5)
     )
@@ -317,7 +305,7 @@ def p_028(dataset: Dataset) -> None:
     店舗コード（store_cd）ごとに売上金額（amount）の中央値を計算し、降順でTOP5を表示せよ。"""
     res = (
         dataset.df_receipt.groupby("store_cd")
-        .agg(pl.col("amount").median().alias("amount_median"))
+        .agg(amount_median=pl.col("amount").median())
         .sort("amount_median", descending=True)
         .head(5)
     )
@@ -411,7 +399,7 @@ def p_035(dataset: Dataset) -> None:
         )
         .groupby("customer_id")
         .agg(pl.col("amount").sum())
-        .with_columns(pl.col("amount").mean().alias("avg_amount"))
+        .with_columns(avg_amount=pl.col("amount").mean())
         .filter(pl.col("amount") >= pl.col("avg_amount"))
         .head(10)
     )
@@ -476,13 +464,13 @@ def p_039(dataset: Dataset) -> None:
     )
     df_cnt = (
         df_member_data.groupby("customer_id")
-        .agg(pl.col("sales_ymd").n_unique().alias("cnt_sales_ymd"))
+        .agg(cnt_sales_ymd=pl.col("sales_ymd").n_unique())
         .sort("cnt_sales_ymd", descending=True)
         .head(20)
     )
     df_sum = (
         df_member_data.groupby("customer_id")
-        .agg(pl.col("amount").sum().alias("sum_amount"))
+        .agg(sum_amount=pl.col("amount").sum())
         .sort("sum_amount", descending=True)
         .head(20)
     )
@@ -514,9 +502,7 @@ def p_041(dataset: Dataset) -> None:
         dataset.df_receipt.groupby("sales_ymd")
         .agg(pl.col("amount").sum())
         .sort("sales_ymd")
-        .with_columns(
-            (pl.col("amount") - pl.col("amount").shift()).alias("diff_amount")
-        )
+        .with_columns(diff_amount=(pl.col("amount") - pl.col("amount").shift()))
         .head(10)
     )
     print(res)
@@ -536,12 +522,8 @@ def p_043(dataset: Dataset) -> None:
             dataset.df_receipt, on="customer_id", how="left"
         )
         .with_columns(
-            [
-                ((pl.col("age") / 10).floor() * 10).alias("age_range"),
-                pl.col("gender_cd")
-                .apply(lambda x: gender_map[x])
-                .alias("gender"),
-            ]
+            age_range=((pl.col("age") / 10).floor() * 10),
+            gender=pl.col("gender_cd").apply(lambda x: gender_map[x]),
         )
         .groupby(["gender", "age_range"])
         .agg(pl.col("amount").sum())
@@ -561,12 +543,8 @@ def p_044(dataset: Dataset) -> None:
             dataset.df_receipt, how="left", on="customer_id"
         )
         .with_columns(
-            [
-                ((pl.col("age") / 10).floor() * 10).alias("age_range"),
-                pl.col("gender_cd")
-                .apply(lambda x: gender_map[x])
-                .alias("gender"),
-            ]
+            age_range=((pl.col("age") / 10).floor() * 10),
+            gender=pl.col("gender_cd").apply(lambda x: gender_map[x]),
         )
         .groupby(["gender", "age_range"])
         .agg(pl.col("amount").sum())
@@ -632,15 +610,14 @@ def p_049(dataset: Dataset) -> None:
     「年」だけ取り出してレシート番号(receipt_no)、レシートサブ番号（receipt_sub_no）とともに10件表示せよ。
     """
     res = dataset.df_receipt.select(
-        [
-            "receipt_no",
-            "receipt_sub_no",
+        receipt_no="receipt_no",
+        receipt_sub_no="receipt_sub_no",
+        sales_year=(
             pl.col("sales_epoch")
             .cast(pl.Utf8)
             .str.strptime(pl.Datetime, "%s")
             .dt.year()
-            .alias("sales_year"),
-        ]
+        ),
     ).head(10)
     print(res)
 
@@ -651,13 +628,8 @@ def p_050(dataset: Dataset) -> None:
     レシートサブ番号（receipt_sub_no）とともに10件表示せよ。なお、「月」は0埋め2桁で取り出すこと。
     """
     res = dataset.df_receipt.select(
-        [
-            "receipt_no",
-            "receipt_sub_no",
-            pl.col("sales_epoch")
-            .cast(pl.Datetime)
-            .dt.strftime("%m")
-            .alias("sales_month"),
-        ]
+        receipt_no="receipt_no",
+        receipt_sub_no="receipt_sub_no",
+        sales_month=pl.col("sales_epoch").cast(pl.Datetime).dt.strftime("%m"),
     )
     print(res)
