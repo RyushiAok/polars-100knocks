@@ -303,3 +303,109 @@ def p_033() -> None:
     """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）の平均を計算し、330以上のものを抽出せよ。"""
     res = dataset.df_receipt.groupby("store_cd").agg(pl.col("amount").mean()).filter(pl.col("amount") >= 330).sort("store_cd")
     print(res)
+
+
+def p_034() -> None:
+    """
+    レシート明細データ（df_receipt）に対し、顧客ID（customer_id）ごとに売上金額（amount）を合計して全顧客の平均を求めよ。
+    ただし、顧客IDが"Z"から始まるものは非会員を表すため、除外して計算すること
+    """
+    res = (
+        dataset.df_receipt.filter(pl.col("customer_id").str.starts_with("Z").is_not())
+        .groupby("customer_id")
+        .agg(pl.col("amount").sum())
+        .select(pl.col("amount").mean())
+    )
+    print(res)
+
+
+def p_035() -> None:
+    """
+    レシート明細データ（df_receipt）に対し、顧客ID（customer_id）ごとに売上金額（amount）を合計して全顧客の平均を求め、
+    平均以上に買い物をしている顧客を抽出し、10件表示せよ。
+    ただし、顧客IDが"Z"から始まるものは非会員を表すため、除外して計算すること。
+    """
+    res = (
+        dataset.df_receipt.filter(pl.col("customer_id").str.starts_with("Z").is_not())
+        .groupby("customer_id")
+        .agg(pl.col("amount").sum())
+        .with_columns(pl.col("amount").mean().alias("avg_amount"))
+        .filter(pl.col("amount") >= pl.col("avg_amount"))
+        .head(10)
+    )
+    print(res)
+
+
+def p_036() -> None:
+    """レシート明細データ（df_receipt）と店舗データ（df_store）を内部結合し、レシート明細データの全項目と店舗データの店舗名（store_name）を10件表示せよ。"""
+    res = dataset.df_receipt.join(
+        dataset.df_store.select(["store_cd", "store_name"]),
+        on="store_cd",
+        how="inner",
+    ).head(10)
+    print(res)
+
+
+def p_037() -> None:
+    """
+    商品データ（df_product）とカテゴリデータ（df_category）を内部結合し、
+    商品データの全項目とカテゴリデータのカテゴリ小区分名（category_small_name）を10件表示せよ
+    """
+    res = dataset.df_product.join(
+        dataset.df_category.select(["category_small_cd", "category_small_name"]),
+        on="category_small_cd",
+        how="inner",
+    ).head(10)
+    print(res)
+
+
+def p_038() -> None:
+    """
+    顧客データ（df_customer）とレシート明細データ（df_receipt）から、顧客ごとの売上金額合計を求め、10件表示せよ。
+    ただし、売上実績がない顧客については売上金額を0として表示させること。
+    また、顧客は性別コード（gender_cd）が女性（1）であるものを対象とし、非会員（顧客IDが"Z"から始まるもの）は除外すること。
+    """
+    res = (
+        dataset.df_customer.filter((pl.col("gender_cd") == "1") & (pl.col("customer_id").str.starts_with("Z").is_not()))
+        .join(dataset.df_receipt, on="customer_id", how="left")
+        .groupby("customer_id")
+        .agg(pl.col("amount").sum().fill_null(0))
+        .head(10)
+    )
+    print(res)
+
+
+def p_039() -> None:
+    """
+    レシート明細データ（df_receipt）から、売上日数の多い顧客の上位20件を抽出したデータと、
+    売上金額合計の多い顧客の上位20件を抽出したデータをそれぞれ作成し、さらにその2つを完全外部結合せよ。
+    ただし、非会員（顧客IDが"Z"から始まるもの）は除外すること。
+    """
+    df_member_data = dataset.df_receipt.filter(pl.col("customer_id").str.starts_with("Z").is_not())
+    df_cnt = (
+        df_member_data.groupby("customer_id")
+        .agg(pl.col("sales_ymd").n_unique().alias("cnt_sales_ymd"))
+        .sort("cnt_sales_ymd", descending=True)
+        .head(20)
+    )
+    df_sum = (
+        df_member_data.groupby("customer_id")
+        .agg(pl.col("amount").sum().alias("sum_amount"))
+        .sort("sum_amount", descending=True)
+        .head(20)
+    )
+    res = df_cnt.join(df_sum, on="customer_id", how="outer")
+    print(res)
+
+
+def p_040() -> None:
+    """全ての店舗と全ての商品を組み合わせたデータを作成したい。店舗データ（df_store）と商品データ（df_product）を直積し、件数を計算せよ。"""
+    res = (
+        dataset.df_store.with_columns(pl.lit(0).alias("key"))
+        .join(dataset.df_product.with_columns(pl.lit(0).alias("key")), on="key", how="inner")
+        .shape
+    )
+    print(res)
+
+
+p_040()
