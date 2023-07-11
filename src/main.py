@@ -211,4 +211,95 @@ def p_020() -> None:
     print(data)
 
 
-p_019()
+def p_021() -> None:
+    """レシート明細データ（df_receipt）に対し、件数をカウントせよ。"""
+    res = len(dataset.df_receipt)
+    print(res)
+
+
+def p_022() -> None:
+    """レシート明細データ（df_receipt）の顧客ID（customer_id）に対し、ユニーク件数をカウントせよ。"""
+    res = len(dataset.df_receipt.select(pl.col("customer_id").n_unique()))
+    print(res)
+
+
+def p_023() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）と売上数量（quantity）を合計せよ。"""
+    res = dataset.df_receipt.groupby("store_cd").agg([pl.col("amount").sum(), pl.col("quantity").sum()])
+    print(res)
+
+
+def p_024() -> None:
+    """レシート明細データ（df_receipt）に対し、顧客ID（customer_id）ごとに最も新しい売上年月日（sales_ymd）を求め、10件表示せよ。"""
+    res = dataset.df_receipt.groupby("customer_id").agg(pl.col("sales_ymd").max()).head(10)
+    print(res)
+
+
+def p_025() -> None:
+    """レシート明細データ（df_receipt）に対し、顧客ID（customer_id）ごとに最も古い売上年月日（sales_ymd）を求め、10件表示せよ。"""
+    res = dataset.df_receipt.groupby("customer_id").agg(pl.col("sales_yml").min()).head(10)
+    print(res)
+
+
+def p_026() -> None:
+    """レシート明細データ（df_receipt）に対し、顧客ID（customer_id）ごとに最も新しい売上年月日（sales_ymd）と古い売上年月日を求め、両者が異なるデータを10件表示せよ。"""
+    res = (
+        dataset.df_receipt.groupby("customer_id")
+        .agg([pl.col("sales_ymd").min().alias("sales_ymd_min"), pl.col("sales_ymd").max().alias("sales_ymd_max")])
+        .filter(pl.col("sales_ymd_min") != pl.col("sales_ymd_max"))
+        .sort("customer_id")
+        .head(10)
+    )
+    print(res)
+
+
+def p_027() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）の平均を計算し、降順でTOP5を表示せよ。"""
+    res = (
+        dataset.df_receipt.groupby("store_cd")
+        .agg(pl.col("amount").mean().alias("amount_mean"))
+        .sort("amount_mean", descending=True)
+        .head(5)
+    )
+    print(res)
+
+
+def p_028() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）の中央値を計算し、降順でTOP5を表示せよ。"""
+    res = (
+        dataset.df_receipt.groupby("store_cd")
+        .agg(pl.col("amount").median().alias("amount_median"))
+        .sort("amount_median", descending=True)
+        .head(5)
+    )
+    print(res)
+
+
+def p_029() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに商品コード（product_cd）の最頻値を求め、10件表示させよ。"""
+    res = dataset.df_receipt.groupby("store_cd").agg(pl.col("product_cd").mode()).select(["store_cd", pl.col("product_cd").arr])
+    print(res)
+
+
+def p_030() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）の分散を計算し、降順で5件表示せよ。"""
+    res = dataset.df_receipt.groupby("store_cd").agg(pl.col("amount").var()).sort("amount", descending=True).head(5)
+    print(res)
+
+
+def p_031() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）の標準偏差を計算し、降順で5件表示せよ。"""
+    res = dataset.df_receipt.groupby("store_cd").agg(pl.col("amount").std()).sort("amount", descending=True).head(5)
+    print(res)
+
+
+def p_032() -> None:
+    """レシート明細データ（df_receipt）の売上金額（amount）について、25%刻みでパーセンタイル値を求めよ。"""
+    res = dataset.df_receipt.select([pl.col("amount").quantile(i).alias(f"q_{i}") for i in [0, 0.25, 0.5, 0.75, 1]])
+    print(res)
+
+
+def p_033() -> None:
+    """レシート明細データ（df_receipt）に対し、店舗コード（store_cd）ごとに売上金額（amount）の平均を計算し、330以上のものを抽出せよ。"""
+    res = dataset.df_receipt.groupby("store_cd").agg(pl.col("amount").mean()).filter(pl.col("amount") >= 330).sort("store_cd")
+    print(res)
