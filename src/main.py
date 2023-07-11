@@ -7,7 +7,7 @@ from dotenv import dotenv_values
 from src.utils.dataset import load_100knock_data
 
 config = {
-    **dotenv_values(join(dirname(__file__), "../.envs.example")),
+    **dotenv_values(join(dirname(__file__), "../.env.example")),
     **dotenv_values(join(dirname(__file__), "../.env.local")),
 }
 
