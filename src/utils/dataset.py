@@ -44,10 +44,22 @@ def load_100knock_data(dataset_dir: str) -> Dataset:
     - df_geocode: 住所データ
     """
     return Dataset(
-        df_customer=pl.read_csv(join(dataset_dir, "../data/customer.csv"), dtypes=dtypes),
-        df_category=pl.read_csv(join(dataset_dir, "../data/category.csv"), dtypes=dtypes),
-        df_product=pl.read_csv(join(dataset_dir, "../data/product.csv"), dtypes=dtypes),
-        df_receipt=pl.read_csv(join(dataset_dir, "../data/receipt.csv"), dtypes=dtypes),
-        df_store=pl.read_csv(join(dataset_dir, "../data/store.csv"), dtypes=dtypes),
-        df_geocode=pl.read_csv(join(dataset_dir, "../data/geocode.csv"), dtypes=dtypes),
+        df_customer=pl.read_csv(
+            join(dataset_dir, "../data/customer.csv"), dtypes=dtypes
+        ),
+        df_category=pl.read_csv(
+            join(dataset_dir, "../data/category.csv"), dtypes=dtypes
+        ),
+        df_product=pl.read_csv(
+            join(dataset_dir, "../data/product.csv"), dtypes=dtypes
+        ),
+        df_receipt=pl.read_csv(
+            join(dataset_dir, "../data/receipt.csv"), dtypes=dtypes
+        ),
+        df_store=pl.read_csv(
+            join(dataset_dir, "../data/store.csv"), dtypes=dtypes
+        ),
+        df_geocode=pl.read_csv(
+            join(dataset_dir, "../data/geocode.csv"), dtypes=dtypes
+        ),
     )
