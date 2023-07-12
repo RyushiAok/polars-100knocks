@@ -1,10 +1,9 @@
 import os
 from os.path import dirname, join
 
+import knocks
 from dotenv import dotenv_values
-
-import polars100.knocks as knocks
-from polars100.utils.dataset import load_100knock_data
+from utils.dataset import load_100knock_data
 
 config = {
     **dotenv_values(join(dirname(__file__), "../.env.example")),
