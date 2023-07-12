@@ -37,7 +37,7 @@ def p_004() -> None:
 
 
 def n_gram(words: list[str], n: int) -> list[list[str]]:
-    return [words[i : i + n] for i in range(len(words) - n + 1)]  # noqa: E203
+    return [words[i : i + n] for i in range(len(words) - n + 1)]
 
 
 def p_005() -> None:
