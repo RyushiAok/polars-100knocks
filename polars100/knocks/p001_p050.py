@@ -1,6 +1,6 @@
 import polars as pl
 
-from src.utils.dataset import Dataset
+from polars100.utils.dataset import Dataset
 
 
 def p_001(dataset: Dataset) -> None:

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "polars-100knocks"
+name = "python-100knocks"
 version = "0.1.0"
 description = ""
 authors = ["RyushiAok <55625375+RyushiAok@users.noreply.github.com>"]
@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "polars_100knocks" }]
 
 [tool.taskipy.tasks]
-main = "poetry run python src/main.py"
+polars100 = "poetry run python polars100/main.py"
 test = "poetry run pytest"
 
 [tool.poetry.dependencies]

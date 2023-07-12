@@ -3,8 +3,8 @@ from os.path import dirname, join
 
 from dotenv import dotenv_values
 
-import src.knocks as knocks
-from src.utils.dataset import load_100knock_data
+import polars100.knocks as knocks
+from polars100.utils.dataset import load_100knock_data
 
 config = {
     **dotenv_values(join(dirname(__file__), "../.env.example")),

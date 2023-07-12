@@ -2,7 +2,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-# Polars 100 Knocks
+# Python 100 Knocks
 ## Installation
 ```sh
 pyenv local 3.11.x
@@ -11,7 +11,7 @@ poetry run pre-commit install
 ```
 ## Run
 ```sh
-poetry run task main
+poetry run task polars100
 ```
 ## Test
 ```sh
