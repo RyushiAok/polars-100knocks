@@ -11,7 +11,11 @@ poetry run pre-commit install
 ```
 ## Run
 ```sh
+# polars 100knocks
 poetry run task polars100
+
+# nlp 100knocks
+poetry run task nlp100
 ```
 ## Test
 ```sh

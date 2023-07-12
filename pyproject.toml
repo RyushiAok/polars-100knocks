@@ -8,6 +8,7 @@ packages = [{ include = "polars_100knocks" }]
 
 [tool.taskipy.tasks]
 polars100 = "poetry run python polars100/main.py"
+nlp100 = "poetry run python nlp100/main.py"
 test = "poetry run pytest"
 
 [tool.poetry.dependencies]
