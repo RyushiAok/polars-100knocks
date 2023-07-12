@@ -1,6 +1,3 @@
-def p_000() -> None:
-    stressed = "stressed"
-    print(stressed[::-1])
+import ch01
 
-
-p_000()
+ch01.p_009()
